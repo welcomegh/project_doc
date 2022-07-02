@@ -1,0 +1,1125 @@
+DEVOPS PROJECT
+Setup CI/CD pipeline with jenkins, git and github
+a. setup jenkins
+b. run a testjob
+c. setup and configure maven and git
+d. setup tomcat server
+e. installing additional plugin
+f. integrating git maven jenkins job
+g. run CI/CD pipeline job
+----------------------------------------------------------------
+a. startup with jenkins server
+   1. setup a linux EC2-instance
+   2. install java
+   3. install jenkins
+   4. start jenkins
+   5. access web user interface (UI) using port 8080(default)
+----------------------------------------------------------------
+steps
+1. setup dockerhost
+2. setup ec2 linx 
+3. start docker services
+4. integrate docker with jenkins
+5. automate CI/CD to deploy application on docker container
+-----------------------------------------------------------------
+ansible-server
+----------------
+1. prepare ansivle server
+2. setup ec2-instance
+3. setup hostname
+4. 
+5. add user to sudovrs file
+6. generate ssh key
+7. enable password base login
+8. integrate docker with ansivle
+9. integrate ansible with jenkins
+10.run jenkins ci/cd job to deploy on containers using ansible 
+------------------------------------------------------------------
+project steps
+----------------------------------------------------------------
+1. launch ec2-instance with amazon linux with security gp custom tcp with port 8080
+2. steps to install java
+3. java --version
+4. (root)0yum install java -y
+5. which java
+6. /usr/bin/java   
+7. find /usr/lib/jvm/java-1.8* | head -n 3
+8. ls -la
+9. vi .bash_profile
+above path JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-10. 8.0.312.b07-1.amzn2.0.2.x86_64
+11. :$JAVA_HOME
+12 exit
+13 sudo -i
+14 echo $JAVA_HOME
+15 /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.312.b07-1.amzn2.0.2.x86_64
+16  yum install jenkins
+17  sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+18  sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+19    yum install fontconfig java-11-openjdk
+20  yum install jenkins
+21  service jenkins status
+22  service jenkins start 
+23  service jenkins status
+24 goto browser give public ip with port 8080
+25 cat /var/lib/jenkins/secrets/initialAdminPassword
+       904ba32393a54ba7b526b98c0ad50c2d
+26 install with suggested pluggin
+27 go to jenkins browser and start
+29 start jenkins
+30 global tool configuration
+40 add jdk
+41 java_home
+42 path-/usr/lib/jvm/java-1.8.0-openjdk-10. 8.0.312.b07-1.amzn2.0.2.x86_64
+43 save and apply
+44 create simple job
+45 new job
+46 freestyle
+47 execute shell
+48 echo "wel come to devops project"
+49 save and apply
+50 build now
+51 configure maven and git
+52 git
+53 yum install git
+54 git 
+55 come to  jenkins
+56 manage pluggins
+57 avilable
+58 github integration
+59 install without restart
+60 manage jenkins
+61 global tool configuration
+62 git add
+63 name- github
+64 path to git-git
+65 maven download in browser
+66 cd /opt
+67pwd
+68  wget https://dlcdn.apache.org/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz
+70 pwd
+71 ls -l
+72 mvn
+73  tar -xvzf apache-maven-3.8.6-bin.tar.gz
+74  ls -l
+75  mv apache-maven-3.8.6 maven
+76  ls -l
+77  cd maven/
+78  pwd
+79 maven path-/opt/maven
+80 vi ~/.bash_profile
+81 below java_home M2_HOME=/opt/maven
+                             M2=/opt/maven/bin
+                              PATH  :$M2_HOME:$M2
+82 mvn --version
+83 logout and login
+84 tomcat server
+85 go to jenkins
+86 add maven 
+87 name=M2_HOME 
+88 maven home=/opt/maven
+89 manage jenkins-manage pluggins-available-maven release pluggin 
+90 build one maven job
+91 newjob,scm-git,github-url,loginto git hub-create new repo copy source code to this new repo-upload-drag and drop-commit changes-code-copy url
+92 goal- clean install package
+93 post build action-deploy ear/war to container-**/*.war-add to container-tomcat 8 -add credential-username-deployer-deployer-deployeruser-tomcatuser-add-none-jenkins-select credential-save and apply
+94 go to workspace-webapp-target-webapp.war
+95 go to linux machine cd /var/lib/jenkins/workspace
+96 ls -l
+97 see webapp.war
+98 once we get war file deploy it on the tomcat server
+----------------------------------------------------------------------------------
+99 create ec2 m/c-amazon linux
+100 yum install java-1.8* -y and set java path in .bash_profile
+101 cd /opt
+       wget https://dlcdn.apache.org/tomcat/tomcat-8/v8.5.81/bin/apache-tomcat-8.5.81.tar.gz
+102 tar -xvzf apache-tomcat-8.5.81.tar.gz
+103 ls -l
+104 mv apache-tomcat-8.5.81 tomcat
+105 ls -la
+106 cd tomcat
+107 ll
+108 cd bin/
+109 ll
+110 ./startup.sh
+111 go to browser open tomcat using ip with port
+112 403 access denied
+113 find / -name context.xml
+114 edit manager and host-manager
+115 go to browser setup username and paasword
+       /root/tomcat/conf/context.xml
+       /root/tomcat/webapps/examples/META-INF/context.xml
+       /root/tomcat/webapps/host-manager/META-INF/context.xml
+       /root/tomcat/webapps/manager/META-INF/context.xml
+116 edit conf folder
+117 end of the file add bellow one
+ <role rolename="manager-gui"/>
+	<role rolename="manager-script"/>
+	<role rolename="manager-jmx"/>
+	<role rolename="manager-status"/>
+	<user username="admin" password="admin" roles="manager-gui, manager-script, manager-jmx, manager-status"/>
+	<user username="deployer" password="deployer" roles="manager-script"/>
+	<user username="tomcat" password="s3cret" roles="manager-gui"/>
+118 goto bin folder and do tomcat shutdown and startup
+119 go to jenkins browser-managejenkins-avaiable-deploy to container-install
+120 create job
+121 deploy-on-tomcat-server
+122 maven project
+123 give information above maven project
+124 post build steps -- deploy to container-**/*.war
+125 add to container - version of tomcat
+126 add credential
+127 username-deployer,deployer,deployer-user,tomcatdeploy
+128 select credential jenkins
+129 give tomcat url
+130 save and apply
+131 give tomcat cd /tomcat see the war file
+132 ls -l
+129 go jenkins give poll scm
+130 edit in git hub application and go to browser and check
+
+--------------------------------------------------------------------------------------------------
+setup dockerhost
+----------------------------
+setup linux ec2-instance
+install docker
+start docker services
+run some commands
+integrate docker with jenkins
+autoomate CI/CD to deploy apllication on docker container
+1. create linux m/c
+2. set security gp 
+3. connect to mobaxterm
+4. hostname docker-server
+5. sudo su -
+6. yum install docker
+7. service docker status
+8. service docker start
+9. service docker start
+10. go to docker hub search for tomcat
+11. docker pull tomcat
+12. docker images
+13. docker container run -d --name tomcat-container -p 8080:8080 tomcat
+14. docker exec -it tomcat-container /bin/bash
+15. ls
+16. cd webapps
+ls -l
+cd ..
+cd webapps.dist
+ls -l
+cp -R * ../webapps
+cd ..
+cd webapps
+ls -l
+go to browser and refresh u got tomcat web page
+exit
+come to jenkins-manage jenkins-manage pluggins-available-publish over ssh-install
+come to cmd
+useradd dockeradmin
+passwd dockeradmin
+dockeradmin
+dockeradmin
+cat /etc/group
+id dockeradmin
+usermod -aG docker dockeradmin
+id dockeradmin
+ip addr
+vi /etc/ssh/sshd_config
+service sshd reload
+take private ip
+come to jenkins
+system configure
+ssh-server
+add
+docker-server
+name-docker-admin
+hostname-private ip of docker m/c
+advance
+use password authentication-type password
+test configuration
+success
+run deployment on docker create new job
+new item
+deploy-on-docker
+copy from select deploy-on-tomcat
+description-deploy on tomcat
+git url
+remove reploy ear/war also
+remove container
+postbuild action
+seclect build artifact over ssh
+source file-webapp/target/*.war
+remote directory .
+apply and save
+come to cmd
+ls -la
+pwd
+su - dockeradmin
+pwd
+/home/docker
+ls
+go to jenkins and build now
+come to cmd 
+ls -la
+webapp
+target
+webapp.war
+pwd
+come to jenkins remove prifix-webapp/target-save  and apply
+cd..
+cd..
+remove webapp
+rm -rf webapp
+see war file in /home/dockeradmin
+create image from war file and from image create container 
+vi dockerfile
+FROM tomcat
+MAINTAINER ashwini
+COPY ./webapp.war /usr/local/tomcat/webapps
+ls have dockerfile and webapp.war
+docker build -t devops-project .
+docker images
+docker ps -a
+remove running container
+docker rm -f container id
+docker run -d --name devops-container -p 8080:8080 devops-project
+go to browser give ip address with :8080/webapp
+come to jenkins
+create job new item-deploy-on-container
+copy from-deploy-on-docker
+description deploy on container
+just add exec command=cd /home/dockeradmin; docker build -t devops-image .;enter
+docker run -d --name devops-container -p 8080:8080 devops-image;save and apply
+come to cmd
+ls -l
+remove rm -rf webapp.war
+docker images
+docker ps -a
+remove images-docker rmi imagename keep tomcat image
+remove container docker rm -f containername
+go to jenkins
+build now
+come to cmd
+ls -l
+date
+go to brouser and refresh
+docker images
+docker ps -a
+run job once again it give result unstble
+(docker is for contineous integration not for contineous deployment so using ansible)remove images and containers keep only dockerfile and tomcat image
+---------------------------------------------------------------------------
+steps to setup ansible
+----------------------------------------------------------------------------
+setup ec2 instance
+1. setup hostname
+2. create ansadmin user
+3. add user to sudoers file
+4. generate ssh keys
+5. enable password base login
+6. integrate docker with ansible
+7. integrate ansible with jenkins
+8. rum jenkins CI/CD job to deploy on container using ansible
+launch ec2-instance with linux
+hostname ansible-server
+sudo su -
+install ansible
+yum install python
+yum install python-pip
+pip install ansible
+ansible --version
+useradd ansadmin
+passwd ansadmin
+visudo
+end of the line add ansadmin ALL=(ALL)       NOPASSWD: ALL
+vi /etc/ssh/sshd_config
+service sshd reload
+yum install docker
+usermod -aG docker ansadmin
+service docker status
+serevice docker start
+service docker status
+su - ansadmin
+ssh-keygen
+ls -la
+cd .ssh
+ls -la
+cat id_rsa.pub
+cd ..
+pwd
+/home/ansadmin
+copy key and paste into notepad
+come to the docker host m/c
+useradd ansadmin
+passwd ansadmin
+visudo
+add ansadmin ALL=(ALL)         NOPASSWD: ALL
+come to ansible-server
+ansadmin@ansible-server~]$ssh-copy-id ansadmin@dockerprivateip
+ssh ansadmin@dockerprivateip
+ur in docker m/c (we have establish the connection ansible to the docker)
+exit
+$cd /etc
+sudo mkdir ansible
+cd ansible
+ls -l
+sudo vi hosts
+add localhost and docker private ip addr
+ssh-copy-id localhost
+ansible all -m ping
+cd /opt
+sudo mkdir docker
+sudo chown -R ansadmin:ansadmin /opt/docker
+cd /opt/docker
+pwd
+go to jenkins and establish connection from ansible to the jenkins
+manage jenkins-system configure-ssh server-name-name-ansible-server-hostname-ansibleserver private ip-advance give password-test configure 
+save and apply
+create job-deploy-on-container-using-ansible
+copy from=deploy-on-container
+deploy-on-container-using-ansible=postbuild action=instaed of docker server make it ansible-server,remotedirectory-//opt//docker,remove exec command, run job it shoul create war file in thhe docker folder in ansible-server
+vi dockerfile
+     FROM tomcat
+     MAINTAINER ashwini
+     COPY ./webapp.war /usr/local/tomcat/webapps
+vi sample-devops-image.yml
+---
+- hosts: all
+  become: true
+      tasks:
+      - name: build docker image using war file     
+        command: docker build -t sample-docker-image .
+        args:
+            chdir: /opt/docker
+ls -l
+docker images
+docker ps -a
+cat /etc/ansible/hosts
+sudo vi hosts-localhost 
+ls -l
+cat sample-devops-image.yml
+ansible-playbook -i hosts sample-devops-image.yml --check
+ansible-playbook -i hosts sample-devops-image.yml
+docker images
+vi sample-devops-image.yml
+---
+- hosts: all
+  become: true
+      tasks:
+      - name: build docker image using war file     
+        command: docker build -t sample-docker-image .
+        args:
+            chdir: /opt/docker
+     - name: create container using sample devops image
+       command: docker run -d --name sample-devops-container -p 8080:8080 sample-devops-image.yml
+ansible-playbook -i hosts sample-devops-image.yml
+docker images
+docker ps -a
+go to browser give ansible ip with 8080/webapp ans see application
+remove container and remove all images
+ls -l
+    dockerfile
+    sample-devops-image.yml
+    hosts
+    webapp.war
+rename 
+    mv sample-devops-image.yml sample-devops-project.yml
+go to jenkins
+select job deploy-on-container-using-ansible
+configure
+exec command
+     ansible-playbook -i /opt/docker/hosts /opt/docker/sample-devops-project.yml;
+apply and save
+run job
+come to cmd
+docker images
+docker ps
+go to browser and check
+do change in git hub run job it gives unstable again go to yml file edit
+vi sample-devops-project.yml
+---
+- hosts: all
+  become: true
+      tasks:
+      - name: stop current reading container
+        command: docker stop sample-devops-container
+        ignore_errors: yes
+
+      - name: delete stopped container
+        command: docker rm sample-devops-container
+        ignore_errors: yes
+
+      - name: remove docker image
+        command: doocker rmi sample-devops-image
+        ignore_errors: yes
+
+      - name: build docker image using war file     
+        command: docker build -t sample-docker-image .
+        args:
+            chdir: /opt/docker
+     - name: create container using sample devops image
+       command: docker run -d --name sample-devops-container -p 8080:8080 sample-devops-image
+
+goto jenkins run job
+docker images
+docker ps -a
+do changes in the git hub
+again go to jenkins run job
+success
+give poll scm again do changes in the gibhub and come to jenkins and wait
+come to cmd 
+docker images
+docker ps
+date
+check timing
+----------------------------------------------------------------------------
+(push image into the docker hub)
+login to ansible-server
+su - ansadmin
+cd /opt/docker
+ls -l
+  dockerfile
+  hosts
+  sample-devops-image.yml
+  webapp.war
+docker images
+docker ps -a
+docker rm -f container-id
+ls -la
+cat sample-devops-image.yml
+
+vi create-sample-devops-image.yml
+---
+- hosts: all
+  #become: true
+      
+  tasks:
+      - name: build docker image using war file     
+        command: docker build -t sample-docker-image .
+        args:
+            chdir: /opt/docker
+   
+      - name: create tag to image
+        command: docker tag sample-devops-image ashwinidockerhub1/sample-devops-image
+
+      - name: push image onto the docker hub
+        command: docker push ashwinidockerhub1/sample-devops-image
+
+     - name: remove docker image from ansible server
+       command: docker rmi sample-devops-image ashwinidockerhub1/sample-devops-image
+       ignore_errors: yes
+
+docker images
+docker ps -a
+ansible-playbook -i hosts create-sample-devops-image.yml
+dockerlogin
+username and password of dockerhub
+ansible-playbook -i hosts create-sample-devops-image.yml
+docker images
+ls -l
+mv sample-devops-project.yml create-sample-devops-project.yml
+ls -l
+  create-sample-devops-image.yml
+  create-sample-devops-project.yml
+  dockerfile
+  hosts
+  webapp.war
+
+vi create-sample-devops-project.yml
+---
+- hosts: all
+  become: true
+      tasks:
+      - name: stop current reading container
+        command: docker stop sample-devops-container
+        ignore_errors: yes
+
+      - name: delete stopped container
+        command: docker rm sample-devops-container
+        ignore_errors: yes
+
+      - name: remove docker image
+        command: doocker rmi ashwinidockerhub1/sample-devops-image:latest
+        ignore_errors: yes
+
+      #- name: build docker image using war file     
+        #command: docker build -t sample-devops-image .
+       # args:
+            #chdir: /opt/docker
+
+     - name: pull docker image from docker hub
+       command: docker pull ashwinidockerhub1/sample-devops-image:latest
+
+     - name: create container using sample devops image
+       command: docker run -d --name sample-devops-container -p 8080:8080 ashwinidockerhub1/sample-devops-image:latest
+
+docker images
+docker ps -a
+no images no container
+ansible-playbook -i hosts create-sample-devops-project.yml
+docker images
+docker ps
+add docker private ip to hosts file in ansible server
+vi hosts
+localhost
+docker private-ip
+ls -l
+pwd
+cat create-sample-devops-image.yml
+cat create-sample-devops-project.yml
+docker images
+remove all images and containers
+cat hosts
+ansible-playbook -i hosts create-sample-devops-image.yml --limit localhost
+go to dockerhub see the latest image
+docker images
+docker ps -a
+no images no containers
+come to docker server m/c
+ls -l
+docker images
+docker service start
+docker images
+docker ps -a
+remove images and containers
+docker images
+docker ps -a
+take docker public ip and give it on browser:8080/webapp
+nothing is thr
+come to ansible
+ansible-playbook -i hosts create-sample-devops-project.yml --limit docker private ip
+go to browser and check update
+come to the jenkins
+create new item
+deploy-on-docker-container-using-ansible
+copy from-dploy-on-container-using-ansible
+description-deploy on container using ansible playbook,exec command=ansible-playbook -i /opt/docker/hosts /opt/docker/create-sample-devops-image.yml --limit localhost;
+ansible-playbook -i /opt/docker/hosts /opt/docker/create-sample-devops-project.yml --limit dockerprivate-ip-addr;
+apply and save
+come to ansible server
+docker images
+docker ps
+delete images and containers
+come to docker m/c
+remove images and containers
+go to browser and refresh nothing is thr
+go to jenkins run the job
+success
+goto browser see the update
+goto both server docker and ansible check images and containers
+go to github and edit
+give poll scm and see changes
+go to github copy the code url
+come to jenkins-server
+git
+yum install git
+mkdir git_demo
+git clone url
+ll
+jenkins_prject
+ll
+see index.jsp
+vi index.jsp
+edit line
+git add .
+git commit -m "updated file"
+git config --global user.email "ashwini.dhula@gmail.com"
+git config --global user.name "ashwini"
+go to github create token
+git push origin master
+give github username
+token paste
+goto github and see changes
+----------------------------------------------------------------------------------
+installation of kubernetees
+1)installing kops
+ curl -Lo kops https://github.com/kubernetes/kops/releases/download/$(curl -s https://api.github.com/repos/kubernetes/kops/releases/latest | grep tag_name | cut -d '"' -f 4)/kops-linux-amd64
+
+chmod +x ./kops
+
+sudo mv ./kops /usr/local/bin/
+kobs can be used to create production grade kubernates cluster
+
+****************************************************************************************
+apt-get update
+
+****************************************************************************************
+****** Installing Other Dependencies(KubeCtl) *******
+
+curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+
+ chmod +x ./kubectl
+
+sudo mv ./kubectl /usr/local/bin/kubectl
+
+****************************************************************************************
+
+****** Download Python PIP *******
+
+Linux Machine:
+
+1. sudo apt-get install python3-pip
+
+****** Installing AWS CLI *******
+    
+pip install awscli
+
+****************************************************************************************
+k8s ssh key:
+
+ssh-keygen
+
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDgkGF/nPsNca1I8tEN+T5Y4KrEVrTLFooiw5hRf9KJ3CrDA5vNHYhVj8Uk1lypZbA0mWKuCYk+mNh9kArdDBHdNMYvCFOyrJYcxxHw0FyZTQSqfP8fgPdfpk2w0inoGPaWEB8P6OBSVLsB1ZCI6ZFCEJ9hZOSZ2hNqoDRX73sVUNxpBUSEw7kJWPIDuCv15m+o7/uicKZubZa5EV2xRPeTrHsxz1Mlatle6sOLmqm2jIsyW+moU2ajq4cdyaxGcg65vhul5JHb966+Yg8k3/C2CPeft8sSP9JlLZZ7cL1UZKJRhwWPs2cEwk4RSnmc2+8a83DQ6xw6R5/Sit4r63gBklsuko2/DORnCSgwLeOeeS9ROq/ubZ31NXKtaDFm4GB5I8KWLq1qhKyoM6rStJQltR8FWEw9M7tic2YT0tIyYirF9VRKUW6jXkMQv1PY2+ja53l1ghzoks0ZFQJ3SNfnlAEdieJ1Doz/8TmQp8PLqBVO3T+dwacPasidkealsC8= root@ip-172-31-36-98
+
+****************************************************************************************           
+      configuration: 
+    aws configure
+
+****************************************************************************************                                                               
+create an iam user for kubernetes use following permission
+ 1-amazon ec2 full access
+  2amazon route53 full access
+  amazon s3 full acess
+  amazon iam full access
+  amazon vpc full access
+         or
+ administrative access
+
+ create iam user
+ create s3 bucket
+ create dns name using route53(paid service) so instead of this i am using kubernetes domain name==name.k8s.local
+****************************************************************************************
+s3 bucket:
+bucket name: kops-bucket77
+
+****************************************************************************************
+ IAM user for kops-1
+
+ Access key ID- AKIA5MB4BUDTR6XDAQUO
+ Secret access key- 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
+ 
+****************************************************************************************
+create kubernetes cluster
+
+kops create cluster --yes --state=s3://kops-bucket77 --zones=ap-south-1a --node-count=2 --node-size=t2.medium --master-size=t2.medium --name=test.k8s.local
+
+2.validate cluster:
+kops validate cluster --state=s3://kops-bucket77
+
+kubectl get node
+
+ssh -i ~/.ssh/id_rsa ubuntu@65.0.184.250
+
+deletecluster
+
+kops delete cluster --name test.k8s.local --yes --state=s3://kops-bucket77
+
+ kops update cluster test.k8s.local --yes --state=s3://kops-bucket77
+
+*************************************************************************************
+Kubernatees steps:-
+
+1  curl -Lo kops https://github.com/kubernetes/kops/releases/download/$(curl -s https://api.github.com/repos/kubernetes/kops/releases/latest | grep tag_name | cut -d '"' -f 4)/kops-linux-amd64
+    2  apt-get update
+    3  ls
+    4  ls -l
+    5  chmod +x ./kops
+    6  ls -l
+    7  sudo mv ./kops /usr/local/bin/
+    8  curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+    9  chmod +x ./kubectl
+   10  sudo mv ./kubectl /usr/local/bin/kubectl   
+   13  apt install python3-pip
+   14  pip install awscli   
+   16  ssh-keygen
+   17  ls -a
+   18  cd .ssh
+   19  ls -l
+   20  cat id_rsa.pub
+   21  cd ~
+   22  Go to AWS and create a user called kops (give following permission for the user)
+         a) AWS EC2 FUll ACCESS
+         b) AWS route53 FULL Access
+         c) AWS S3 Full access
+         d) AWS IAM Full Access
+         e) AWS VPC Full access
+   
+         or 
+         
+         Administrative access
+      
+   23  Go to AWS and create a bucket called kops-store-state25
+
+   24  Then create a DNS domain name using Route53 in AWS (For real scenario), company           will give DNS name or u can create using route53.  But as now we will use free DNS        domain name provided by kubernetes i.e name.k8s.local (name=anyname).
+
+   25  kops create cluster --yes --state=s3://k8s-state-store25 --zones=ap-south-1a --       node-count=2 --node-size=t2.micro --master-size=t2.micro --name=demo.k8s.local
+
+   27  If the above command gives error then do aws configure
+   28  aws configure
+       (give access id and secret key then, enter enter) now u can run the cluster               command.)
+   29  kops validate cluster --state=s3://k8s-state-store25   (It will show if the                                                                       cluster is ready.)
+      Check in AWS ec2, instances will be created. It will create 1 master & 2 nodes as we have given count 2. 
+
+   29  hostname k8s-management-server
+   30  sudo su - 
+   31  
+   32  ssh -i ~/.ssh/id_rsa ubuntu@(ipadress of master server) (we will be able to login from management server to master)
+
+     ---exit from master by saying exit
+
+   33  kubectl get nodes (it will show the available nodes)
+   34  kops update cluster demo.k8s.local --yes --state=s3://k8s-state-store25  (we are        updating the cluster) 
+
+      ----connect to master----
+
+   35  ssh -i ~/.ssh/id_rsa ubuntu@13.232.206.179
+   36  ls -la (it will show .kube file which is required to run kubectl commands)
+   37  kubectl get nodes
+   38  sudo -i
+   39  hostname k8s-master
+   40  sudo su -
+   41  kubectl get nodes  (u cant see the .kube file from root)
+   42  cp -R /home/ubuntu/.kube .  (we are copying the .kube file from ubuntu to root &          placing in the current directory)
+   43  ls -la  (it will now show .kube file)
+   44  kubectl get nodes  (Now we are able to run kubectl commands)
+
+       NOw I have to create some containers & I have to access the containers from the        servers. 
+   45  kubectl get pods (right now there are no pods)
+   46  kubectl get deploy (
+   47  kubectl get service 
+
+       Right now no pods running means no containers. If we want to create a pod we need to create a deployment. when we create a deployment then only the pod will be created & then if we expose that pod to a particular service then we can see what service we are running.
+
+(note: /////to delete cluster
+kops delete cluster --name test.k8s.local --yes --state=s3://kops-test-2022
+-------------------------------------------------------------------
+k8s integration with jenkins to create CI/CD pipeline
+  1. install k8s using kops/kubeadm
+  2. create k8s cluster
+  3. write a deployment and service files to create and access pods
+   4. integrate k8s master with ansible
+   5. create ansible playbook for deploy and service file
+   6. create jenkins deployment job for k8s
+   7. complete CI/CD job to build and deploy code on k8s
+
+create cluster
+validate
+loginto master
+sudo -i
+set hostname
+pwd
+ls -l
+copy .kube folder to master root
+cp -R /home/ubuntu/.kube .
+kubectl get nodes
+
+vi k8s-deployment.yml
+--------------------------
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+    name: k8s-deployment
+spec:
+   selector:
+      matchLabels:
+           app: k8s-devops-project
+   replicas: 2 # tells deployment to run 2 pods matching the template
+   template:
+      metadata:
+          labels:
+              app: k8s-devops-project
+      spec:
+         containers:
+         - name: k8s-devops-project
+           image: ashwinidockerhub1/sample-devops-image:latest
+           ports:
+           - containerPort: 8080
+
+
+vi k8s-service.yml
+--------------------
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: k8s-service
+    labels:
+       app: k8s-devops-project
+spec:
+   selector:
+       app: k8s-devops-project
+   type: LoadBalancer
+   ports:
+      - port: 8080
+        targetPort: 8080
+        nodePort: 31200
+------------------------
+ls -l
+pwd-   /root
+kubectl get pods
+kubectl apply -f k8s-deployment.yml
+kubectl get pods
+(now u create service using these pods)
+goto browser and check give ip:31300/webapp of two nodes
+nothing is thr because service is not thr
+kubectl apply -f k8s-service..yml
+kubectl get service
+kubectl get deploy
+kubectl get service servicename
+kubectl delete deploy deploymentname
+(run these script using ansible)
+come to ansible server
+su - ansadmin
+ls -l
+cd .ssh
+ls -l
+cat id_rsa.pub
+come to k8s-mater
+ls -la
+cd .ssh
+ls -l
+vi authorized_keys
+paste that ansible key here at last chnage hostname with  private ip of ansibleserver
+come to the ansible server
+ssh -i ~/.ssh/id_rsa root@public ip of master
+so now u are in master server
+exit
+now u r in ansible server
+cd /opt
+ls -l
+sudo mkdir kubernetes
+ls -l
+cd kubernetes
+sudo vi hosts
+  [ansible_server]
+  localhost
+  [kubernetes]
+  public ip
+ls -l
+write yml script which will run deployment script
+
+sudo vi k8s-deploy.yml
+---
+- name: create pods using deployment
+  hosts: kubernetes
+  become: true
+  user: root
+
+  tasks:
+  - name: create a deployment
+    command: kubectl apply -f k8s-deployment.yml
+
+sudo vi k8s-svc.yml
+---
+- name: create service for deployment
+  hosts: kubernetes
+  become: true
+  user: root
+
+  tasks:
+  - name: create a service
+    command: kubectl apply -f k8s-service.yml
+
+come to the kubernetes master
+kubectl delete service servicename
+kubectl delete deploy deploymentname
+no deployment no services no pods
+come to ansible server
+ansible-playbook -i hosts k8s-deploy.yml
+ansible-playbook -i hosts k8s-svc.yml
+come to kubernetes mater u have all service,pods,deploy
+go to browser and check u see the application
+delete all service,pods,deploy
+ls -l
+in msater server have two files 
+        k8s-deployment.yml 
+        k8s-servie.yml
+in ansible server u have two files 
+        k8s-deploy.yml
+        k8s-svc.yml
+come to the jenkins
+create new item------deploy-on-kubernetes-CD
+select freestyle-ok
+description-deploy on kubernetes-postbuild actions-send build artifact over ssh-exec command=ansible-playbook -i /opt/kubernetes/hosts /opt/kubernetes/k8s-deploy.yml;
+ansible-playbook -i /opt/kubernetes/hosts /opt/kubernetes/k8s-svc.yml; 
+apply and save
+goto browser nothing is thr
+come to master server
+no deployment no service no pods
+come to jenkins run the job
+come to browser and refresh
+come to master and check
+now create the CI job to push image to the docker hub
+goto the ansible server and login to ansible server
+cd /opt/docker
+ls -l
+    create-sample-devops-image.yml
+    create-sample-devops-project.yml
+    vi hosts
+    dockerfile
+    webapp.war
+come to the jenkins 
+create new item 
+deploy on kubernetes-CI
+copy from deploy-docker-container-using-ansible
+ok
+description-deploy to container using ansible
+postbuild action
+exec command=ansible-playbook -i /opt/docker/hosts /opt/docker/create-sample-devoips-image..yml --limit localhost;
+save and apply
+build the job
+unstable
+come to docker m/c
+sudo docker service start
+sudo docker service status
+go to the jenkins build the job again  
+unstable
+come to ansible m/c
+exit
+docker images
+service docker status
+service docker start
+docker images
+come to jenkins build now 
+success
+go to browser see updated image
+(CD job CIjob are ready)
+come to ansible server
+su - ansadmin
+cd /opt/docker
+ls -l
+instead of keeping all files in docker keep it into the kubernetes folder
+sudo cp create-sample-devops-image.yml create-sample-devops-project.yml dockerfile hosts webapp.war /opt/kubernetes
+cd ..
+cd /kubernetes
+delete docker folder sudo rm -rf docker
+ls -l
+total 7 files are the
+cat hosts---localhost docker and kubernetes private ip addr
+ls -l
+
+sudo vi create-sample-devops-image.yml
+---
+- hosts: all
+  become: true
+      
+  tasks:
+      - name: build docker image using war file     
+        command: docker build -t sample-docker-image .
+        args:
+            chdir: /opt/kubernetes
+   
+      - name: create tag to image
+        command: docker tag sample-devops-image ashwinidockerhub1/sample-devops-image
+
+      - name: push image onto the docker hub
+        command: docker push ashwinidockerhub1/sample-devops-image
+
+     - name: remove docker image from ansible server
+       command: docker rmi sample-devops-image ashwinidockerhub1/sample-devops-image
+       ignore_errors: yes
+
+ls -l
+all files have root permission change into the ansadmin
+sudo chown -R ansadmin:ansadmin /opt/kubernetes
+ls -l
+permission change to ansadmin
+pwd-/opt/kubernetes
+come to the jenkins
+open CI job
+exec command 
+ansible-playbook -i /opt/kubernetes/hosts /opt/kubernetes/create-sample-devops-image.yml --limit localhost;
+save and apply
+goto browser docker hub refresh
+run the job
+(if got unstable then #become: true)
+
+create dependency
+once the CI job run autometically run CD job
+open CI job-post build action-build other job-projects to build-deploy-on-kubernetes-CD
+save and apply
+come to master server delete service,delete deploy,delete pods
+go to githhub make changes
+dont keep poll scm in any job
+build CI job
+autometically run CD job
+if got unstable
+
+come to master server
+cd ..
+
+vi k8s-deployment.yml 
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+    name: k8s-deployment
+spec:
+   selector:
+      matchLabels:
+           app: k8s-devops-project
+   replicas: 2 # tells deployment to run 2 pods matching the template
+   strategy:
+       type: Rollingupdate
+       rollingupdate:
+            maxSurge: 1
+            maxUnavailable: 1
+    templete:
+       metadata:
+           labels:
+              app: k8s-devops-project
+      spec:
+         containers:
+         - name: k8s-devops-project
+           image: ashwinidockerhub1/sample-devops-image:latest
+           ports:
+           - containerPort: 8080
+
+
+come to ansible server
+ls -l
+have all files
+ 
+vi k8s-deploy.yml
+---
+- name: create pods using deployment
+  hosts: kubernetes
+  become: true
+  user: root
+
+  tasks:
+  - name: create a deployment
+    command: kubectl apply -f k8s-deployment.yml
+
+   - name: update deployment with new pods if image updated in docker hub
+     command: kubctl rollout restart deployment.v1.apps/k8s-deployment
+
+now go to jenkins
+run CD job-success
+CD job-unstable
+come to ansible server manually run the job
+ansible-playbook -i hosts k8s-deploy.yml
+ansible all -m ping
+vi hosts
+check id address
+   master server
+   localhost
+   docker server
+ansible-playbook -i hosts k8s-deploy.yml
+cat vi hosts
+vi /etc/ansible/hosts
+give master ip addr
+vi hosts
+give public ip of master
+go to jenkins run CD job
+success
+go to browser and refresh
+check in github also
+enable poll scm
+edit in githhub
+see the changes
+deployment done 
+
+
+
+
+
